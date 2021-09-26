@@ -7,12 +7,15 @@ import framework.variable.holder.VariableHolder;
 import framework.variable.holder.VariableHolderAware;
 import lombok.Getter;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math3.geometry.euclidean.oned.Interval;
 
 @Getter
 public class LaboratoryState extends AbstractApplicationState
     implements VariableHolderAware {
 
     private PolynomialFunction function;
+
+    private Interval interval;
 
     private double precision;
 
@@ -26,12 +29,16 @@ public class LaboratoryState extends AbstractApplicationState
         this.variableNameToSetter.put("precision", (name, value) -> StateHelper.defaultSet(name, "precision",
                 value, Double.class, (obj) -> (Double) obj, this::setPrecision
         ));
+        this.variableNameToSetter.put("interval", (name, value) -> StateHelper.defaultSet(name, "interval",
+                value, Interval.class, (obj) -> (Interval) obj, this::setInterval
+        ));
     }
 
     @Override
     protected void initVariableNameToGettersMap() {
         this.variableNameToGetter.put("function", this::getFunction);
         this.variableNameToGetter.put("precision", this::getPrecision);
+        this.variableNameToGetter.put("interval", this::getInterval);
     }
 
     public void setFunction(PolynomialFunction function) {
@@ -40,6 +47,14 @@ public class LaboratoryState extends AbstractApplicationState
             return;
         }
         this.function = function;
+    }
+
+    public void setInterval(Interval interval) {
+        if (interval == null) {
+            ConsoleUtils.println("Interval must not be null");
+            return;
+        }
+        this.interval = interval;
     }
 
     public void setPrecision(double precision) {
