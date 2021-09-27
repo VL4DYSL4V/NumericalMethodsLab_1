@@ -2,7 +2,8 @@ package command;
 
 import framework.command.RunnableCommand;
 
-public class RunCommand implements RunnableCommand {
+public class DecompressionCommand implements RunnableCommand {
+
     @Override
     public void execute(String[] strings) {
 

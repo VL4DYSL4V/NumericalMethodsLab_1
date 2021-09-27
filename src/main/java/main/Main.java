@@ -1,8 +1,8 @@
 package main;
 
-import command.RunCommand;
+import command.DecompressionCommand;
+import command.ModifiedNewtonCommand;
 import framework.application.Application;
-import framework.command.RunnableCommand;
 import framework.state.ApplicationState;
 import state.LaboratoryState;
 
@@ -12,9 +12,9 @@ public class Main {
 
     public static void main(String[] args) {
         ApplicationState state = new LaboratoryState();
-        RunnableCommand runnableCommand = new RunCommand();
         Application application = new Application.ApplicationBuilder(PROPERTIES_PATH_STRING, state)
-                .addCommand("run", runnableCommand)
+                .addCommand("modified-newton", new ModifiedNewtonCommand())
+                .addCommand("decompression", new DecompressionCommand())
                 .build();
         application.start();
     }

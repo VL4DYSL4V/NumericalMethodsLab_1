@@ -1,0 +1,16 @@
+package dto;
+
+import lombok.Data;
+import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math3.geometry.euclidean.oned.Interval;
+
+@Data
+public class ParametersDto {
+
+    private final PolynomialFunction function;
+
+    private final Interval interval;
+
+    private final double precision;
+
+}
