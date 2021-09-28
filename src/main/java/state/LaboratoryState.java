@@ -13,7 +13,7 @@ import org.apache.commons.math3.geometry.euclidean.oned.Interval;
 public class LaboratoryState extends AbstractApplicationState
     implements VariableHolderAware {
 
-    private PolynomialFunction function;
+    private final  PolynomialFunction function = new PolynomialFunction(new double[]{-8, -14, -3, 1});
 
     private Interval interval;
 
@@ -23,9 +23,6 @@ public class LaboratoryState extends AbstractApplicationState
 
     @Override
     protected void initVariableNameToSettersMap() {
-        this.variableNameToSetter.put("function", (name, value) -> StateHelper.defaultSet(name, "function",
-                value, PolynomialFunction.class, (obj) -> (PolynomialFunction) obj, this::setFunction
-        ));
         this.variableNameToSetter.put("precision", (name, value) -> StateHelper.defaultSet(name, "precision",
                 value, Double.class, (obj) -> (Double) obj, this::setPrecision
         ));
@@ -39,14 +36,6 @@ public class LaboratoryState extends AbstractApplicationState
         this.variableNameToGetter.put("function", this::getFunction);
         this.variableNameToGetter.put("precision", this::getPrecision);
         this.variableNameToGetter.put("interval", this::getInterval);
-    }
-
-    public void setFunction(PolynomialFunction function) {
-        if (function == null) {
-            ConsoleUtils.println("Function cannot be null");
-            return;
-        }
-        this.function = function;
     }
 
     public void setInterval(Interval interval) {

@@ -13,11 +13,6 @@ public class ParameterUtils {
     private ParameterUtils(){}
 
     public static Optional<ParametersDto> getParametersOrAskForThem(ApplicationState state) {
-        PolynomialFunction function = (PolynomialFunction) state.getVariable("function");
-        if (function == null) {
-            ConsoleUtils.println("Pleas, specify the function");
-            return Optional.empty();
-        }
         double precision = (Double) state.getVariable("precision");
         if (precision <= 0) {
             ConsoleUtils.println("Pleas, specify the precision");
@@ -28,6 +23,6 @@ public class ParameterUtils {
             ConsoleUtils.println("Pleas, specify the precision");
             return Optional.empty();
         }
-        return Optional.of(new ParametersDto(function, interval, precision));
+        return Optional.of(new ParametersDto(interval, precision));
     }
 }

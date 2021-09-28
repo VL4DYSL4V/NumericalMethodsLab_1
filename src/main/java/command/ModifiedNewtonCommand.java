@@ -7,10 +7,9 @@ import framework.state.ApplicationStateAware;
 import framework.utils.ConsoleUtils;
 import framework.utils.ValidationUtils;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
-import org.apache.commons.math3.analysis.polynomials.PolynomialsUtils;
+import org.apache.commons.math3.geometry.euclidean.oned.Interval;
 import utils.ParameterUtils;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.Optional;
 
 public class ModifiedNewtonCommand implements RunnableCommand, ApplicationStateAware {
@@ -22,28 +21,32 @@ public class ModifiedNewtonCommand implements RunnableCommand, ApplicationStateA
         ValidationUtils.requireNonNull(state);
         Optional<ParametersDto> parametersOptional = ParameterUtils.getParametersOrAskForThem(state);
         if (parametersOptional.isPresent()) {
+            PolynomialFunction function = (PolynomialFunction) state.getVariable("function");
             ParametersDto dto = parametersOptional.get();
-            if (dto.getFunction().degree() < 2) {
-                ConsoleUtils.println("Polynomial function's degree is too small");
+            Interval interval = dto.getInterval();
+            double product = function.value(interval.getInf()) * function.value(interval.getSup());
+            if (product > 0) {
+                ConsoleUtils.println("f(a)*f(b) must be <= 0");
                 return;
             }
-            double product = dto.getFunction().value(dto.getInterval().getInf()) *
-                    dto.getFunction().value(dto.getInterval().getSup());
-            if (product >= 0) {
-                ConsoleUtils.println("f(a)*f(b) must be < 0");
-                return;
-            }
-            PolynomialFunction firstDerivative = dto.getFunction().polynomialDerivative();
-            PolynomialFunction secondDerivative = firstDerivative.polynomialDerivative();
-            ConsoleUtils.println(firstDerivative.toString());
-            ConsoleUtils.println(secondDerivative.toString());
-
-
+            modifiedNewton(function, interval, dto.getPrecision());
         }
     }
 
-    private static double computeIterationsCount() {
-        throw new RuntimeException();
+    public static void modifiedNewton(PolynomialFunction function, Interval interval, double precision) {
+        PolynomialFunction firstDerivative = function.polynomialDerivative();
+        PolynomialFunction secondDerivative = firstDerivative.polynomialDerivative();
+        double x0 = function.value(interval.getInf()) * secondDerivative.value(interval.getInf()) <= 0
+                ? interval.getSup()
+                : interval.getInf();
+        double x = x0;
+        int iterationCount = 0;
+        do {
+            x -= function.value(x) / firstDerivative.value(x0);
+            iterationCount++;
+        } while (Math.abs(function.value(x) / firstDerivative.value(x0)) >= precision);
+        ConsoleUtils.println(String.format("X = %f", x));
+        ConsoleUtils.println(String.format("Iteration count: %d", iterationCount));
     }
 
     @Override
