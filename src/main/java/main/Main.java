@@ -1,6 +1,6 @@
 package main;
 
-import command.DecompressionCommand;
+import command.RelaxationCommand;
 import command.ModifiedNewtonCommand;
 import framework.application.Application;
 import framework.state.ApplicationState;
@@ -14,7 +14,7 @@ public class Main {
         ApplicationState state = new LaboratoryState();
         Application application = new Application.ApplicationBuilder(PROPERTIES_PATH_STRING, state)
                 .addCommand("modified-newton", new ModifiedNewtonCommand())
-                .addCommand("decompression", new DecompressionCommand())
+                .addCommand("relaxation", new RelaxationCommand())
                 .build();
         application.start();
     }

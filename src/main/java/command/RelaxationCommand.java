@@ -11,7 +11,7 @@ import utils.ParameterUtils;
 
 import java.util.Optional;
 
-public class DecompressionCommand implements RunnableCommand, ApplicationStateAware {
+public class RelaxationCommand implements RunnableCommand, ApplicationStateAware {
 
     private ApplicationState state;
 
