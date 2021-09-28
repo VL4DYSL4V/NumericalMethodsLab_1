@@ -21,17 +21,22 @@ public class RelaxationCommand implements RunnableCommand, ApplicationStateAware
         ValidationUtils.requireNonNull(state);
         Optional<ParametersDto> parametersOptional = ParameterUtils.getParametersOrAskForThem(state);
         if (parametersOptional.isPresent()) {
-            PolynomialFunction function = (PolynomialFunction) state.getVariable("function");
             Interval interval = parametersOptional.get().getInterval();
-            double precision = parametersOptional.get().getPrecision();
             Interval intervalOfConvergence = getIntervalOfConvergence();
-            ConsoleUtils.println(intervalOfConvergence.getInf() + " - " + intervalOfConvergence.getSup());
+            if (interval.getInf() < intervalOfConvergence.getInf() || interval.getSup() > intervalOfConvergence.getSup()) {
+                String template = "Interval of convergence: %f - %f";
+                ConsoleUtils.println(String.format(template, intervalOfConvergence.getInf(), intervalOfConvergence.getSup()));
+                return;
+            }
+            double precision = parametersOptional.get().getPrecision();
+            PolynomialFunction function = (PolynomialFunction) state.getVariable("function");
             relaxation(function, interval, precision);
         }
     }
 
     private static void relaxation(PolynomialFunction function, Interval interval, double precision) {
-        double tau = getTau(function.polynomialDerivative());
+        PolynomialFunction derivative = function.polynomialDerivative();
+        double tau = getTau(derivative);
         double x = interval.getInf();
         ConsoleUtils.println(String.format("tau: %f", tau));
         double prevX = x;
@@ -42,8 +47,8 @@ public class RelaxationCommand implements RunnableCommand, ApplicationStateAware
             prevX = x;
             x = x + tau * function.value(x);
             iterationCount++;
-        } while (iterationCount < 10 || Math.pow(x - prevX, 2) / Math.abs(2 * prevX - x - prevX2) < precision);
-        ConsoleUtils.println(String.format("X = %f", x));
+        } while (iterationCount < 5 || Math.pow(x - prevX, 2) / Math.abs(2 * prevX - x - prevX2) < precision);
+        ConsoleUtils.println(String.format("x = %f", x));
         ConsoleUtils.println(String.format("f(x) = %f", function.value(x)));
         ConsoleUtils.println(String.format("Iteration count: %d", iterationCount));
 

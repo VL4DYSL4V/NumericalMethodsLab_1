@@ -45,7 +45,8 @@ public class ModifiedNewtonCommand implements RunnableCommand, ApplicationStateA
             x -= function.value(x) / firstDerivative.value(x0);
             iterationCount++;
         } while (Math.abs(function.value(x) / firstDerivative.value(x0)) >= precision);
-        ConsoleUtils.println(String.format("X = %f", x));
+        ConsoleUtils.println(String.format("x = %f", x));
+        ConsoleUtils.println(String.format("f(x) = %f", function.value(x)));
         ConsoleUtils.println(String.format("Iteration count: %d", iterationCount));
     }
 
