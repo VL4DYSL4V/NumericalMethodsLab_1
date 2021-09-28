@@ -17,7 +17,7 @@ public class LaboratoryState extends AbstractApplicationState
 
     private Interval interval;
 
-    private double precision;
+    private double precision = 1e-4;
 
     private VariableHolder variableHolder;
 

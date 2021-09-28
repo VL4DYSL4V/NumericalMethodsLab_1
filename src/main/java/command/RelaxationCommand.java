@@ -4,6 +4,7 @@ import dto.ParametersDto;
 import framework.command.RunnableCommand;
 import framework.state.ApplicationState;
 import framework.state.ApplicationStateAware;
+import framework.utils.ConsoleUtils;
 import framework.utils.ValidationUtils;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.geometry.euclidean.oned.Interval;
@@ -20,10 +21,44 @@ public class RelaxationCommand implements RunnableCommand, ApplicationStateAware
         ValidationUtils.requireNonNull(state);
         Optional<ParametersDto> parametersOptional = ParameterUtils.getParametersOrAskForThem(state);
         if (parametersOptional.isPresent()) {
-//            PolynomialFunction function = parametersOptional.get().getFunction();
-//            Interval interval = parametersOptional.get().getInterval();
-
+            PolynomialFunction function = (PolynomialFunction) state.getVariable("function");
+            Interval interval = parametersOptional.get().getInterval();
+            double precision = parametersOptional.get().getPrecision();
+            Interval intervalOfConvergence = getIntervalOfConvergence();
+            ConsoleUtils.println(intervalOfConvergence.getInf() + " - " + intervalOfConvergence.getSup());
+            relaxation(function, interval, precision);
         }
+    }
+
+    private static void relaxation(PolynomialFunction function, Interval interval, double precision) {
+        double tau = getTau(function.polynomialDerivative());
+        double x = interval.getInf();
+        ConsoleUtils.println(String.format("tau: %f", tau));
+        double prevX = x;
+        double prevX2;
+        int iterationCount = 0;
+        do {
+            prevX2 = prevX;
+            prevX = x;
+            x = x + tau * function.value(x);
+            iterationCount++;
+        } while (iterationCount < 10 || Math.pow(x - prevX, 2) / Math.abs(2 * prevX - x - prevX2) < precision);
+        ConsoleUtils.println(String.format("X = %f", x));
+        ConsoleUtils.println(String.format("f(x) = %f", function.value(x)));
+        ConsoleUtils.println(String.format("Iteration count: %d", iterationCount));
+
+    }
+
+    private static double getTau(PolynomialFunction derivative) {
+        double term = Math.sqrt(17.0 / 3.0);
+        double m1 = Math.max(Math.abs(derivative.value(1 - term)), 1e-15);
+        double M1 = Math.abs(derivative.value(1));
+        return 2.0 / (m1 + M1);
+    }
+
+    private static Interval getIntervalOfConvergence() {
+        double term = Math.sqrt(17.0 / 3.0);
+        return new Interval(1 - term, 1 + term);
     }
 
     @Override
