@@ -47,7 +47,7 @@ public class RelaxationCommand implements RunnableCommand, ApplicationStateAware
             prevX = x;
             x = x + tau * function.value(x);
             iterationCount++;
-        } while (iterationCount < 5 || Math.pow(x - prevX, 2) / Math.abs(2 * prevX - x - prevX2) < precision);
+        } while (function.value(x) != 0 || Math.pow(x - prevX, 2) / Math.abs(2 * prevX - x - prevX2) < precision);
         ConsoleUtils.println(String.format("x = %f", x));
         ConsoleUtils.println(String.format("f(x) = %f", function.value(x)));
         ConsoleUtils.println(String.format("Iteration count: %d", iterationCount));
